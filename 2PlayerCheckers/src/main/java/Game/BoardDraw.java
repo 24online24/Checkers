@@ -25,27 +25,9 @@ public class BoardDraw {
             }
         }
     }
-
-/*
-    void startPlayers1() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 8; j++) {
-                if ((i + j) % 2 != 0) {
-                    g.setColor(Color.RED);
-                    g.fillOval(j * 100 + 25, i * 100 + 25, 50, 50);
-                }
-            }
-        }
+    
+    public void highlight(int x, int y){
+            g.setColor(Color.GREEN);
+            g.fillRect(x*100, y*100, 100, 100);
     }
-
-    void startPlayers2() {
-        for (int i = 5; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if ((i + j) % 2 != 0) {
-                    g.setColor(Color.WHITE);
-                    g.fillOval(j * 100 + 25, i * 100 + 25, 50, 50);
-                }
-            }
-        }
-    }*/
 }

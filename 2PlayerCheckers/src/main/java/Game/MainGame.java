@@ -5,6 +5,7 @@
 package Game;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,6 +14,12 @@ import java.awt.Graphics;
 public class MainGame extends javax.swing.JFrame {
 
     static Graphics g;
+    ArrayList<Piece> player1;
+    ArrayList<Piece> player2;
+    boolean round;
+    boolean selected;
+    Piece selectedPiece;
+    BoardDraw board;
 
     /**
      * Creates new form MainGame
@@ -33,6 +40,8 @@ public class MainGame extends javax.swing.JFrame {
 
         jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(1280, 720));
@@ -47,6 +56,11 @@ public class MainGame extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 51, 0));
         jPanel1.setMaximumSize(new java.awt.Dimension(800, 800));
         jPanel1.setPreferredSize(new java.awt.Dimension(800, 800));
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel1MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -59,6 +73,10 @@ public class MainGame extends javax.swing.JFrame {
             .addGap(0, 800, Short.MAX_VALUE)
         );
 
+        jLabel1.setText("jLabel1");
+
+        jLabel2.setText("jLabel2");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -68,7 +86,11 @@ public class MainGame extends javax.swing.JFrame {
                 .addComponent(jButton1)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addGap(36, 36, 36)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,7 +101,12 @@ public class MainGame extends javax.swing.JFrame {
                         .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(127, 127, 127)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(76, Short.MAX_VALUE))
         );
 
@@ -87,26 +114,67 @@ public class MainGame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        BoardDraw Board = new BoardDraw();
-        //Board.startPlayers1();
-        //Board.startPlayers2();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 8; j++) {
-                if ((i + j) % 2 != 0) {
-                    Player jeton1 = new Player(i, j, true);
+        board = new BoardDraw();
+        player1 = new ArrayList();
+        player2 = new ArrayList();
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 3; y++) {
+                if ((x + y) % 2 != 0) {
+                    Piece jeton = new Man(x, y, true);
+                    jeton.draw();
+                    player2.add(jeton);
                 }
             }
         }
-        for (int i = 5; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if ((i + j) % 2 != 0) {
-                    Player jeton2 = new Player(i, j, false);
+        for (int x = 0; x < 8; x++) {
+            for (int y = 5; y < 8; y++) {
+                if ((x + y) % 2 != 0) {
+                    Piece jeton = new Man(x, y, false);
+                    jeton.draw();
+                    player1.add(jeton);
                 }
             }
         }
-        
-
+        jLabel1.setText(String.valueOf(player1.size()));
+        jLabel2.setText(String.valueOf(player2.size()));
+        round = false;
+        selected = false;
+        selectedPiece = null;
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+        int xm = evt.getX();
+        int ym = evt.getY();
+        if (!round) {
+            if (!selected) {
+                for (Piece piece : player1) {
+                    if (Math.sqrt((piece.x - xm) * (piece.x - xm) + (piece.y - ym) * (piece.y - ym)) < 25) {
+                        selected = true;
+                        selectedPiece = piece;
+                    }
+                }
+            } else {
+                selectedPiece.move(xm / 100, ym / 100);
+                selected = false;
+                selectedPiece = null;
+                round = !round;
+            }
+        } else {
+            if (!selected) {
+                for (Piece piece : player2) {
+                    if (Math.sqrt((piece.x - xm) * (piece.x - xm) + (piece.y - ym) * (piece.y - ym)) < 25) {
+                        selected = true;
+                        selectedPiece = piece;
+                    }
+                }
+            } else {
+                selectedPiece.move(xm / 100, ym / 100);
+                selected = false;
+                selectedPiece = null;
+                round = !round;
+            }
+        }
+    }//GEN-LAST:event_jPanel1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -145,6 +213,8 @@ public class MainGame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
